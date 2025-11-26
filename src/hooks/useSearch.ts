@@ -9,7 +9,7 @@ const MOCK_BOOKS: BookData[] = [
 ];
 
 export const useSearch = () => {
-    const { setResults, setIsSearching, setQuery, setButlerMessage } = useSearchStore();
+    const { setResults, setIsSearching, setQuery, setButlerMessage, apiKeys } = useSearchStore();
 
     const search = async (q: string) => {
         setQuery(q);
@@ -20,6 +20,57 @@ export const useSearch = () => {
         // Simulate "Thinking" / "Walking to archives"
         await new Promise((resolve) => setTimeout(resolve, 1000));
 
+        // Check if we have API Keys
+        if (apiKeys.bing) {
+            try {
+                // Real Search
+                const res = await fetch(`/api/search?q=${encodeURIComponent(q)}&apiKey=${apiKeys.bing}`);
+                if (!res.ok) throw new Error('Search failed');
+                const data = await res.json();
+
+                setResults(data.books);
+                setIsSearching(false);
+
+                // Real Butler Comment
+                if (apiKeys.openai) {
+                    setButlerMessage("資料が見つかりました。内容を確認しております...");
+                    const context = data.books.map((b: BookData) => `${b.title}: ${b.summary}`).join('\n');
+
+                    const butlerRes = await fetch('/api/butler', {
+                        method: 'POST',
+                        body: JSON.stringify({ prompt: q, context, apiKey: apiKeys.openai }),
+                    });
+
+                    if (butlerRes.ok) {
+                        const reader = butlerRes.body?.getReader();
+                        const decoder = new TextDecoder();
+                        let done = false;
+                        let text = '';
+
+                        if (reader) {
+                            while (!done) {
+                                const { value, done: doneReading } = await reader.read();
+                                done = doneReading;
+                                const chunkValue = decoder.decode(value);
+                                text += chunkValue;
+                                // Stream update if desired, but for now let's set at end or chunks
+                                setButlerMessage(text);
+                            }
+                        }
+                    }
+                } else {
+                    setButlerMessage(`お待たせいたしました。「${q}」に関する文献を${data.books.length}冊ほど選び出しました。`);
+                }
+
+            } catch (e) {
+                console.error(e);
+                setButlerMessage("申し訳ございません。外部書庫への接続に失敗しました。");
+                setIsSearching(false);
+            }
+            return;
+        }
+
+        // --- MOCK FALLBACK ---
         setButlerMessage("ふむ... 興味深い資料がいくつか見つかりそうです。");
         await new Promise((resolve) => setTimeout(resolve, 1000));
 

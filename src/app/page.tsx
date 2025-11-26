@@ -6,6 +6,7 @@ import { SearchProvider } from '@/lib/store';
 import { SearchBar } from '@/components/UI/SearchBar';
 import { Butler } from '@/components/UI/Butler';
 import { Reader } from '@/components/UI/Reader';
+import { Settings } from '@/components/UI/Settings';
 
 export default function Home() {
   return (
@@ -34,6 +35,7 @@ export default function Home() {
           <SearchBar />
           <Butler />
           <Reader />
+          <Settings />
         </div>
       </main>
     </SearchProvider>

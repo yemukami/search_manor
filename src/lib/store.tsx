@@ -21,6 +21,8 @@ type SearchContextType = {
     setSelectedBook: (book: BookData | null) => void;
     butlerMessage: string;
     setButlerMessage: (msg: string) => void;
+    apiKeys: { openai: string; bing: string };
+    setApiKeys: (keys: { openai: string; bing: string }) => void;
 };
 
 const SearchContext = createContext<SearchContextType | undefined>(undefined);
@@ -31,6 +33,7 @@ export const SearchProvider = ({ children }: { children: ReactNode }) => {
     const [isSearching, setIsSearching] = useState(false);
     const [selectedBook, setSelectedBook] = useState<BookData | null>(null);
     const [butlerMessage, setButlerMessage] = useState('ようこそ、知識の館へ。本日はどのようなことをお調べでしょうか？');
+    const [apiKeys, setApiKeys] = useState({ openai: '', bing: '' });
 
     return (
         <SearchContext.Provider
@@ -45,6 +48,8 @@ export const SearchProvider = ({ children }: { children: ReactNode }) => {
                 setSelectedBook,
                 butlerMessage,
                 setButlerMessage,
+                apiKeys,
+                setApiKeys,
             }}
         >
             {children}
