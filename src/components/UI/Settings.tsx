@@ -28,7 +28,7 @@ export const Settings = () => {
             {/* Gear Icon */}
             <button
                 onClick={() => setIsOpen(true)}
-                className="absolute top-8 right-8 z-50 text-white/50 hover:text-white transition-colors p-2"
+                className="absolute top-8 right-8 z-50 text-white/50 hover:text-white transition-colors p-2 pointer-events-auto"
                 title="Settings"
             >
                 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
